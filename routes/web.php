@@ -25,4 +25,7 @@ $router->group(['middleware' => 'auth'], function() use($router) {
     $router->get('/users/{id}', 'UserController@edit');
     $router->put('/users/{id}', 'UserController@update');
     $router->delete('/users/{id}', 'UserController@destroy');
+    $router->get('/users/login', 'UserController@getUserLogin');
+
+    $router->post('/logout', 'UserController@logout');
 });

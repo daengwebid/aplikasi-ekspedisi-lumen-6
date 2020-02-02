@@ -153,4 +153,16 @@ class UserController extends Controller
         }
         return response()->json(['status' => 'error']);
     }
+
+    public function getUserLogin(Request $request)
+    {
+        return response()->json(['status' => 'success', 'data' => $request->user()]);
+    }
+
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+        $user->update(['api_token' => null]);
+        return response()->json(['status' => 'success']);
+    }
 }
