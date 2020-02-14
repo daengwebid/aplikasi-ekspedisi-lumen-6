@@ -10,9 +10,11 @@ use App\Mail\ResetPasswordMail;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::orderBy('created_at', 'desc')->paginate(10);
+        $users = User::orderBy('created_at', 'desc')->when($request->q, function($users) use($request) {
+            $users = $users->where('name', 'LIKE', '%' . $request->q . '%');
+        })->paginate(10);
         return response()->json(['status' => 'success', 'data' => $users]);
     }
 
@@ -69,7 +71,7 @@ class UserController extends Controller
             'address' => 'required|string',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png',
             'email' => 'required|email|unique:users,email,' . $id,
-            'password' => 'required|min:6',
+            'password' => 'nullable|string|min:6',
             'phone_number' => 'required|string',
             'role' => 'required',
             'status' => 'required',
@@ -104,7 +106,9 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = User::find($id);
-        unlink(base_path('public/images/' . $user->photo));
+        if ($user->photo) {
+            unlink(base_path('public/images/' . $user->photo));
+        }
         $user->delete();
         return response()->json(['status' => 'success']);
     }
